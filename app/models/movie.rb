@@ -1,5 +1,5 @@
 class Movie < ActiveRecord::Base
-  attr_accessible :title, :synopsis, :release_date, :poster, :uri_trailer
+  attr_accessible :title, :synopsis, :release_date, :poster, :uri_trailer, :average_rating
   validates :title, presence: true
   validates :release_date, presence: true
 
@@ -9,6 +9,9 @@ class Movie < ActiveRecord::Base
 
   has_many :checkins
   has_many :users, through: :checkins
+
+  has_many :ratings
+  has_many :raters, through: :ratings, source: :user
 
   has_attached_file :poster,
             :styles => { :medium => "256x320>", :thumb => "60x80>" },
@@ -22,9 +25,10 @@ class Movie < ActiveRecord::Base
   
   def self.search(search, type)
     if search
-      find(:all, conditions: ["#{type} LIKE ?", "%#{search}%"])
+      where("#{type} LIKE ?", "%#{search}%")
     else
-      find(:all)
+      all
     end
   end
+
 end
